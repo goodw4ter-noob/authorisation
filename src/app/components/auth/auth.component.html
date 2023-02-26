@@ -1,0 +1,17 @@
+<form nz-form [formGroup]="validateForm" class="login-form" (ngSubmit)="submitForm()">
+  <nz-form-item>
+    <nz-form-control nzErrorTip="{{this.validateForm.get('email')?.errors?.['key'] ?? 'Write your email, please'}}" >
+      <nz-input-group nzPrefixIcon="email">
+        <input type="text" nz-input formControlName="email" placeholder="email" />
+      </nz-input-group>
+    </nz-form-control>
+  </nz-form-item>
+  <nz-form-item>
+    <nz-form-control nzValidatingTip="Validating..." nzErrorTip="{{this.validateForm.get('user')?.errors?.['key'] ?? 'Write your name, please'}}">
+      <nz-input-group nzPrefixIcon="user">
+        <input type="text" nz-input formControlName="user" placeholder="user" />
+      </nz-input-group>
+    </nz-form-control>
+  </nz-form-item>
+  <button nz-button class="login-form-button login-form-margin" [nzType]="'primary'">Sign Up</button>
+</form>
