@@ -1,7 +1,7 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { AbstractControl, AsyncValidatorFn, FormControl, FormGroup, ValidationErrors, Validators } from '@angular/forms';
-import { Observable, of, Subscription, tap } from 'rxjs';
-import { AuthorisationService } from 'src/app/services/authorisation.service';
+import { auditTime, debounceTime, fromEvent, map, Observable, of, Subscription, tap } from 'rxjs';
+import { AuthorisationService, Status } from 'src/app/services/authorisation.service';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 
 
@@ -43,41 +43,28 @@ export class AuthComponent implements OnInit, OnDestroy {
   }
 
   private userNameAsyncValidation(): AsyncValidatorFn {
-    return (control: AbstractControl): Observable<ValidationErrors | null> => {
-      let response!: Observable<ValidationErrors | null>;
-
-      this.authService.validateName(control.value)
+    return (control: AbstractControl<string>): Observable<ValidationErrors | null> => {
+      return this.authService.validateName(control.value)
         .pipe(
-          tap(data => console.log(data)),
-          untilDestroyed(this))
-        .subscribe({
-          next: data => {
-            if (data) response = of({ key: 'The name is already taken' });
-            else response = of(null);
-          },
-          error: err => console.log(err),
-          complete: () => console.log('done!')
-        })
-
-      return response;
+          untilDestroyed(this),
+          map(data => {
+            if (data === true) return { key: 'The name is already taken' }
+            else return null;
+          })
+        )
     }
   }
 
   private asyncEmailValidation(): AsyncValidatorFn {
-    return (control: AbstractControl): Observable<ValidationErrors | null> => {
-      let response!: Observable<ValidationErrors | null>;
-
-      this.authService.validateEmail(control.value)
-        .pipe(untilDestroyed(this))
-        .subscribe(res => {
-          if (res) {
-            response = of({ key: 'The email already exists' });
-          } else {
-            response = of(null);
-          }
-        })
-
-      return response;
+    return (control: AbstractControl<string>): Observable<ValidationErrors | null> => {
+      return this.authService.validateEmail(control.value)
+        .pipe(
+          untilDestroyed(this),
+          map((data: Status) => {
+            if (data === Status.error) return { key: 'The email already exists!' }
+            else return null
+          })
+        )
     }
   }
 

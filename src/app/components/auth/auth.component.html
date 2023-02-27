@@ -1,7 +1,7 @@
 <form nz-form [formGroup]="validateForm" class="login-form" (ngSubmit)="submitForm()">
   <nz-form-item>
     <nz-form-control nzErrorTip="{{this.validateForm.get('email')?.errors?.['key'] ?? 'Write your email, please'}}" >
-      <nz-input-group nzPrefixIcon="email">
+      <nz-input-group nzPrefixIcon="user">
         <input type="text" nz-input formControlName="email" placeholder="email" />
       </nz-input-group>
     </nz-form-control>
